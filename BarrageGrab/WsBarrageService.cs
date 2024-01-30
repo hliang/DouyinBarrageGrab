@@ -17,6 +17,7 @@ using System.IO;
 using BarrageGrab.Modles.JsonEntity;
 using BarrageGrab.Modles.ProtoEntity;
 using System.Drawing;
+using static BarrageGrab.WssBarrageGrab;
 
 namespace BarrageGrab
 {
@@ -55,6 +56,11 @@ namespace BarrageGrab
         /// 控制台打印事件
         /// </summary>
         public event EventHandler<PrintEventArgs> OnPrint;
+
+        /// <summary>
+        /// 表格更新事件
+        /// </summary>
+        public EventHandler<RoomMessageEvent> OnNewRoomMessageEvent;
 
         public WsBarrageService()
         {
@@ -226,6 +232,7 @@ namespace BarrageGrab
 
             var msgType = PackMsgType.直播间统计;
             PrintMsg(enty, msgType);
+            ProcessNewMessageEvent(enty, msgType);
             var pack = new BarrageMsgPack(enty.ToJson(), msgType, e.Process);
             Broadcast(pack);
         }
@@ -308,6 +315,7 @@ namespace BarrageGrab
 
             var msgType = PackMsgType.礼物消息;
             PrintMsg(enty, msgType);
+            ProcessNewMessageEvent(enty, msgType);
             var pack = new BarrageMsgPack(enty.ToJson(), PackMsgType.礼物消息, e.Process);
             Broadcast(pack);
         }
@@ -428,6 +436,7 @@ namespace BarrageGrab
 
             var msgType = PackMsgType.弹幕消息;
             PrintMsg(enty, msgType);
+            ProcessNewMessageEvent(enty, msgType);
 
             var pack = new BarrageMsgPack(enty.ToJson(), msgType, e.Process);
             Broadcast(pack);
@@ -622,6 +631,61 @@ namespace BarrageGrab
             public ConsoleColor Color { get; set; }
 
             public PackMsgType MsgType { get; set; }
+        }
+
+        public class RoomMessageEvent : EventArgs
+        {
+            public string Message { get; set; }
+            public PackMsgType MsgType { get; set; }
+            public Msg MsgData { get; set; }
+        }
+
+        private void ProcessNewMessageEvent(Msg msg, PackMsgType barType)
+        {
+            var rinfo = AppRuntime.RoomCaches.GetCachedWebRoomInfo(msg.RoomId.ToString());
+            var roomName = (rinfo?.Owner?.Nickname ?? ("直播间" + (msg.WebRoomId == 0 ? msg.RoomId : msg.WebRoomId)));
+            var text = $"{DateTime.Now.ToString("HH:mm:ss")} [{roomName}] [{barType}]";
+
+            if (msg.User != null)
+            {
+                text += $" [{msg.User?.GenderToString()}] ";
+            }
+
+            ConsoleColor color = Appsetting.Current.ColorMap[barType].Item1;
+            var append = msg.Content;
+            switch (barType)
+            {
+                case PackMsgType.弹幕消息: append = $"{msg?.User?.Nickname}: {msg.Content}"; break;
+                case PackMsgType.下播: append = $"直播已结束"; break;
+                default: break;
+            }
+
+            text += append;
+
+            Console.WriteLine("ProcessNewMessageEvent 333333 " + text);
+            if (Appsetting.Current.BarrageLog)
+            {
+                Logger.LogBarrage(barType, msg);
+            }
+
+            if (!Appsetting.PrintBarrage) return;
+            if (Appsetting.Current.PrintFilter.Any() && !Appsetting.Current.PrintFilter.Contains(barType.GetHashCode())) return;
+
+            OnNewRoomMessageEvent?.Invoke(this, new RoomMessageEvent()
+            {
+                Message = text,
+                MsgType = barType,
+                MsgData = msg,
+            });
+
+            //if (++count > 10000)
+            //{
+            //    Console.Clear();
+            //    Console.WriteLine("控制台已清理");
+            //    count = 0;
+            //}
+            //console.WriteLine(text + "\n", color);
+            Console.WriteLine("ProcessNewMessageEvent 555555");
         }
     }
 }

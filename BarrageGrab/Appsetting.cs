@@ -44,6 +44,7 @@ namespace BarrageGrab
                 {
                     if (string.IsNullOrWhiteSpace(printFilter)) PrintFilter = new int[0];
                     else PrintFilter = printFilter.Split(',').Select(x => int.Parse(x)).ToArray();
+                    Console.WriteLine("PrintFilter " + AppSettings["printFilter"] + " => " + string.Join(",", PrintFilter));
                 }
                 if (!string.IsNullOrWhiteSpace(pushFilter))
                 {

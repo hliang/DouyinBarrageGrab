@@ -6,6 +6,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using BarrageGrab.Forms;
 
 namespace BarrageGrab
 {
@@ -28,7 +29,8 @@ namespace BarrageGrab
 
             bool exited = false;
             bool formExited = false;
-            AppRuntime.WssService.StartListen();
+            bool form2Exited = false;
+            AppRuntime.WssService.StartListen(); //
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{AppRuntime.WssService.ServerLocation} 弹幕服务已启动...");
@@ -42,13 +44,30 @@ namespace BarrageGrab
                 {
                     mainForm = new FormView();
                     //开启消息循环
+                    Console.WriteLine("FormView starting 11111...");
                     System.Windows.Forms.Application.Run(mainForm);
+                    Console.WriteLine("form 22222...");
                     formExited = true;
                 }));
                 uiThread.SetApartmentState(ApartmentState.STA);
                 uiThread.IsBackground = true;
                 uiThread.Start();
+
+                var uiThread2 = new Thread(new ThreadStart(() =>
+                {
+                    FormChat2Cmd formC2C = new FormChat2Cmd();
+                    //开启消息循环
+                    Console.WriteLine("FormChat2Cmd starting 3333...");
+                    System.Windows.Forms.Application.Run(formC2C);
+                    Console.WriteLine("form 44444...");
+                    form2Exited = true;
+                }));
+                uiThread2.SetApartmentState(ApartmentState.STA);
+                uiThread2.IsBackground = true;
+                uiThread2.Start();
             }
+
+            //FormChat2Cmd formC2C = new FormChat2Cmd();
 
             AppRuntime.WssService.OnClose += (s, e) =>
             {
@@ -58,7 +77,7 @@ namespace BarrageGrab
 
             while (!exited)
             {
-                if (formExited && !exited)
+                if (formExited && form2Exited && !exited)
                 {
                     AppRuntime.WssService.Close();
                 }                    

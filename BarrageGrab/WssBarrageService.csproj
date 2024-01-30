@@ -135,18 +135,18 @@
     <Reference Include="Titanium.Web.Proxy, Version=1.0.1.0, Culture=neutral, PublicKeyToken=8e41e1f1c790d7cf, processorArchitecture=MSIL">
       <HintPath>..\packages\Titanium.Web.Proxy.3.2.2-beta\lib\net461\Titanium.Web.Proxy.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsInput, Version=1.0.4.0, Culture=neutral, PublicKeyToken=9b287f7dc5073cad, processorArchitecture=MSIL">
+      <HintPath>..\packages\InputSimulator.1.0.4.0\lib\net20\WindowsInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppRuntime.cs" />
     <Compile Include="Appsetting.cs" />
-    <Compile Include="Forms - 复制\FormView.cs" />
-    <Compile Include="Forms - 复制\FormView.Designer.cs">
-      <DependentUpon>FormView.cs</DependentUpon>
+    <Compile Include="Forms\FormChat2Cmd.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms - 复制\Models\RoomCacheItem.cs" />
-    <Compile Include="Forms - 复制\RoomDetail.cs" />
-    <Compile Include="Forms - 复制\RoomDetail.Designer.cs">
-      <DependentUpon>RoomDetail.cs</DependentUpon>
+    <Compile Include="Forms\FormChat2Cmd.Designer.cs">
+      <DependentUpon>FormChat2Cmd.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormView.cs">
       <SubType>Form</SubType>
@@ -169,6 +169,11 @@
     <Compile Include="Modles\ProtoEntity\Wss.cs" />
     <Compile Include="Modles\RoomInfo.cs" />
     <Compile Include="ObjectExtension.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Proxy\ProxyEventArgs\HttpResponseEventArgs.cs" />
     <Compile Include="Proxy\ProxyEventArgs\SystemProxyChangeEventArgs.cs" />
     <Compile Include="Proxy\ProxyEventArgs\WsMessageEventArgs.cs" />
@@ -207,17 +212,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms - 复制\FormView.resx">
-      <DependentUpon>FormView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms - 复制\RoomDetail.resx">
-      <DependentUpon>RoomDetail.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormChat2Cmd.resx">
+      <DependentUpon>FormChat2Cmd.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormView.resx">
       <DependentUpon>FormView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RoomDetail.resx">
       <DependentUpon>RoomDetail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

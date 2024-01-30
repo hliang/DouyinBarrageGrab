@@ -160,7 +160,7 @@ namespace BarrageGrab
         Dictionary<string, List<long>> msgDic = new Dictionary<string, List<long>>();
 
         //发送事件
-        private void DoMessage(Message msg,string processName)
+        private void DoMessage(Message msg,string processName)  // IMPORTANT process message and broadcast the result
         {
             List<long> msgIdList;
             if (msgDic.ContainsKey(msg.Method))
