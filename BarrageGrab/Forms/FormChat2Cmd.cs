@@ -23,25 +23,26 @@ namespace BarrageGrab.Forms
         WsBarrageService barServer = AppRuntime.WssService;
         private readonly InputSimulator isim = new InputSimulator();
         List<C2CMappingItem> C2CMappingList = new List<C2CMappingItem>();
-        Dictionary<string, VirtualKeyCode> C2CMappingDict = new Dictionary<string, VirtualKeyCode>();
+        Dictionary<string, List<VirtualKeyCode>> C2CMappingDict = new Dictionary<string, List<VirtualKeyCode>>();
         BindingSource C2CMappingTableSource = new BindingSource();
+        private BindingList<C2CMappingItem> mMyList = new BindingList<C2CMappingItem>();
 
         List<C2CKey> C2CKeyOptionList = new List<C2CKey>
             {
-                new C2CKey() { Name = "A", Value = VirtualKeyCode.VK_A },
-                new C2CKey() { Name = "B", Value = VirtualKeyCode.VK_B },
-                new C2CKey() { Name = "C", Value = VirtualKeyCode.VK_C },
-                new C2CKey() { Name = "D", Value = VirtualKeyCode.VK_D },
-                new C2CKey() { Name = "S", Value = VirtualKeyCode.VK_S },
-                new C2CKey() { Name = "X", Value = VirtualKeyCode.VK_X },
-                new C2CKey() { Name = "Y", Value = VirtualKeyCode.VK_Y },
-                new C2CKey() { Name = "Z", Value = VirtualKeyCode.VK_Z },
-                new C2CKey() { Name = "上", Value = VirtualKeyCode.UP },
-                new C2CKey() { Name = "下", Value = VirtualKeyCode.DOWN },
-                new C2CKey() { Name = "左", Value = VirtualKeyCode.LEFT },
-                new C2CKey() { Name = "右", Value = VirtualKeyCode.RIGHT },
-                new C2CKey() { Name = "鼠标左键", Value = VirtualKeyCode.LBUTTON },
-                new C2CKey() { Name = "鼠标右键", Value = VirtualKeyCode.RBUTTON },
+                new C2CKey() { Name = "A", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_A } },
+                new C2CKey() { Name = "B", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_B } },
+                new C2CKey() { Name = "C", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_C } },
+                new C2CKey() { Name = "D", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_D } },
+                new C2CKey() { Name = "S", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_S } },
+                new C2CKey() { Name = "X", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_X } },
+                new C2CKey() { Name = "Y", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_Y } },
+                new C2CKey() { Name = "Z", Value = new List<VirtualKeyCode> {VirtualKeyCode.VK_Z } },
+                new C2CKey() { Name = "上", Value = new List<VirtualKeyCode> {VirtualKeyCode.UP } },
+                new C2CKey() { Name = "下", Value = new List<VirtualKeyCode> {VirtualKeyCode.DOWN } },
+                new C2CKey() { Name = "左", Value = new List<VirtualKeyCode> {VirtualKeyCode.LEFT } },
+                new C2CKey() { Name = "右", Value = new List<VirtualKeyCode> {VirtualKeyCode.RIGHT } },
+                new C2CKey() { Name = "鼠标左键", Value = new List<VirtualKeyCode> {VirtualKeyCode.LBUTTON } },
+                new C2CKey() { Name = "鼠标右键", Value = new List<VirtualKeyCode> {VirtualKeyCode.RBUTTON } },
             };
 
         public FormChat2Cmd()
@@ -82,19 +83,22 @@ namespace BarrageGrab.Forms
             
             
             //Setup data binding
-            cbx_dstKey.DataSource = C2CKeyOptionList;
+            //cbx_dstKey.DataSource = C2CKeyOptionList;
             cbx_dstKey.DisplayMember = "Name";
             cbx_dstKey.ValueMember = "Value";
+            cbx_dstKey.DataSource = C2CKeyOptionList;
 
             // mapping table
+            mMyList.Add(new C2CMappingItem() { chat = "bbb222", cmdDisplayName = "B", cmdKeyCodes = new List<VirtualKeyCode> { VirtualKeyCode.VK_B } });
             //dataGridView_C2CMappingTable.ReadOnly = true;
             //C2CMappingTableSource.DataSource = C2CMappingList;
             //dataGridView_C2CMappingTable.DataSource = C2CMappingTableSource;
             
             dataGridView_C2CMappingTable.AutoGenerateColumns = false;
+            dataGridView_C2CMappingTable.DataSource = mMyList;
             //dataGridView_C2CMappingTable.DataSource = C2CMappingList;
-            C2CMappingTableSource.DataSource = C2CMappingList;
-            dataGridView_C2CMappingTable.DataSource = C2CMappingTableSource;
+            //C2CMappingTableSource.DataSource = C2CMappingList;
+            //dataGridView_C2CMappingTable.DataSource = C2CMappingTableSource;
             AddC2CMappingTableColumns();
 
         }
@@ -108,7 +112,7 @@ namespace BarrageGrab.Forms
             DataGridViewComboBoxColumn cmdColumn = new DataGridViewComboBoxColumn();
             foreach (var item in C2CKeyOptionList) cmdColumn.Items.Add(item);
             cmdColumn.Name = "按键";
-            cmdColumn.DataPropertyName = "C2CKey";
+            cmdColumn.DataPropertyName = "command";
             cmdColumn.DisplayMember = "Name";
             cmdColumn.ValueMember = "Value";
 
@@ -257,14 +261,16 @@ namespace BarrageGrab.Forms
         class C2CKey
         {
             public string Name { get; set; }
-            public VirtualKeyCode Value { get; set; }
+            public List<VirtualKeyCode> Value { get; set; }
         }
         
         class C2CMappingItem
         {
             public string chat { get; set; }
-            public C2CKey command { get; set; }
-            public string command2 { get; set; }
+            //public string commandDisplayName { get; set; }
+            //public C2CKey command { get; set; }
+            public string cmdDisplayName { get; set; }
+            public List<VirtualKeyCode> cmdKeyCodes { get; set; }
         }
 
         private void btn_addC2CMapping_Click(object sender, EventArgs e)
@@ -272,15 +278,18 @@ namespace BarrageGrab.Forms
             string srcChatMsg = this.txb_srcChatMsg.Text.Trim();
             if (srcChatMsg.Length == 0) return;
             if (this.cbx_dstKey.SelectedValue == null) return;
-            VirtualKeyCode dstKeyValue = (VirtualKeyCode)this.cbx_dstKey.SelectedValue;
+            List<VirtualKeyCode> dstKeyValue = (List<VirtualKeyCode>)this.cbx_dstKey.SelectedValue;
             Console.WriteLine($"adding mapping {srcChatMsg} {dstKeyValue}");
             C2CMappingDict[srcChatMsg] = dstKeyValue;
             C2CKey command = (C2CKey)this.cbx_dstKey.SelectedItem;
-            C2CMappingList.Add(new C2CMappingItem() { chat = srcChatMsg, command = command, command2 = command.Name });
-            C2CMappingTableSource.ResetBindings(false);
+            C2CMappingList.Add(new C2CMappingItem() { chat = srcChatMsg, cmdDisplayName = command.Name, cmdKeyCodes = command.Value });
+            //C2CMappingTableSource.ResetBindings(false);
+            mMyList.Add(new C2CMappingItem() { chat = srcChatMsg, cmdDisplayName = command.Name, cmdKeyCodes = command.Value });
 
             // update table
-
+            //dataGridView_C2CMappingTable.DataSource = null;
+            //dataGridView_C2CMappingTable.DataSource = C2CMappingList;
+            Console.WriteLine("click fn done mMyList=" + mMyList);
         }
     }
 }
